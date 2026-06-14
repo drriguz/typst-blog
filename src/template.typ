@@ -79,8 +79,12 @@
 // Unnumbered margin note (most common in Tufte style)
 #let sidenote = _note.with(counter: none)
 
-// Re-export numbered note for when you want the marker
-#let note = _note
+// Re-export numbered note with system font instead of Inter
+#let note = _note.with(
+  numbering: marginalia.note-numbering.with(
+    style: text.with(weight: 900, font: ("New Computer Modern", "Songti SC"), size: 5pt, style: "normal", fill: rgb(54%, 72%, 95%)),
+  ),
+)
 
 // Re-export notefigure
 #let notefigure = _notefigure

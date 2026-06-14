@@ -17,10 +17,20 @@
 html { font-size: 17px; -webkit-font-smoothing: antialiased; }
 
 body {
-    font-family: "New Computer Modern", "Latin Modern Roman", Georgia, serif;
+    font-family: "New Computer Modern", "Latin Modern Roman", "Songti SC", Georgia, "Times New Roman", serif;
     color: var(--color-text);
     background: var(--color-bg);
     padding: 1.5rem;
+}
+
+/* SVG text font fallbacks - use system fonts with good CJK support */
+svg text {
+    font-family: "Libertinus Serif", "New Computer Modern Math", "Latin Modern Math", "STIX Two Math", "Cambria Math", "Songti SC", Georgia, serif;
+}
+
+/* Code font fallbacks */
+svg text[font-family="DejaVu Sans Mono"] {
+    font-family: "DejaVu Sans Mono", "Fira Code", "JetBrains Mono", "Consolas", "SF Mono", monospace;
 }
 
 a { color: var(--color-link); text-decoration: none; }
