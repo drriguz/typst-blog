@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}All Tags - drriguz{% endblock %}
+
+{% block content %}
+<div class="tags-all">
+    <h1>All Tags</h1>
+    <div class="tags-cloud">
+        {% for tag in tags %}
+        <a href="{{ root_path }}tags/{{ tag.name }}/" class="tag tag-cloud-item">
+            {{ tag.name }} <span class="tag-count">({{ tag.count }})</span>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

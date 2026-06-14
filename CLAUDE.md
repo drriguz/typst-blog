@@ -4,50 +4,73 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-A Tufte-style blog system built with [Typst](https://typst.app). Posts are written in Typst's markup language and compiled to PDF using the [marginalia](https://typst.app/universe/package/marginalia) package for wide margins, sidenotes, and margin figures.
+A Tufte-style static blog generator powered by **Typst**. Posts are written in Typst with the [marginalia](https://typst.app/universe/package/marginalia) package for wide margins, sidenotes, and margin figures. A Rust CLI compiles posts into PDF and HTML (via Typst SVG) with an index page.
 
 ## Build Commands
 
 ```bash
-# Compile a single post (from project root)
-typst compile --root . src/posts/<name>/post.typ
+make build              # Build the static site (cargo run -- build)
+make serve              # Dev server on port 9527 (cargo run -- serve --port 9527)
+make clean              # Remove output/
+make new                # Interactive new post creation (or: cargo run -- new "Title" --tags "tag1,tag2")
+make dev                # Build then serve
 
-# Watch mode for live preview
-typst watch --root . src/posts/<name>/post.typ
-
-# Example: compile the Bayes post
-typst compile --root . src/posts/bayes/post.typ
+cargo test              # Run unit tests (metadata parsing)
 ```
 
-Output PDFs are generated alongside `post.typ` in each post directory.
+Typst-only (without the site generator):
+```bash
+typst compile --root . src/posts/YYYY-MM-DD-slug/post.typ
+typst watch --root . src/posts/YYYY-MM-DD-slug/post.typ
+```
+
+## Project Structure
+
+```
+├── src/
+│   ├── template.typ              # Shared Tufte-style Typst template
+│   └── posts/
+│       └── YYYY-MM-DD-slug/
+│           ├── post.typ          # Post content (Typst)
+│           ├── refs.bib          # Bibliography (BibTeX)
+│           └── images/           # Post-local images (.webp)
+├── templates/                    # Tera HTML templates
+│   ├── base.html, post.html, index.html, tag.html, tags-all.html
+│   └── new-post.typ              # Scaffold for `typst-blog new`
+├── static/css/style.css          # Site stylesheet
+├── src/                          # Rust CLI source (main.rs, build.rs, metadata.rs, template.rs, server.rs)
+├── output/                       # Generated static site (gitignored)
+├── Cargo.toml
+└── Makefile
+```
 
 ## Architecture
 
-```
-src/
-├── template.typ          # Shared Tufte-style template (marginalia, typography, helpers)
-└── posts/
-    └── <topic>/
-        ├── post.typ      # Blog post content
-        ├── refs.bib      # Bibliography (BibTeX)
-        └── images/       # Post-specific images (.webp)
-```
+### Build Pipeline
 
-### Template (`src/template.typ`)
+1. Scan `src/posts/*/post.typ` for metadata (title, date, tags, summary via regex)
+2. Sort posts by date descending
+3. Per post:
+   - **PDF**: `typst compile --root . --format pdf` → copy to `output/posts/<slug>/post.pdf`
+   - **HTML**: `typst compile --root . --format svg` → one SVG per page → embedded in Tera HTML template
+   - **Images**: copy `images/` to `output/posts/<slug>/images/`
+4. Generate `output/index.html` and `output/tags/<tag>/index.html`
+5. Copy `static/` to `output/`
+
+### Typst Template (`src/template.typ`)
 
 All posts import from this shared template. It provides:
 
-- **`blog-post`** — show rule that sets up marginalia layout (40mm outer margin), page headers, fonts, equation numbering, and side-captions for figures
-- **`sidenote[...]`** — unnumbered margin note (most common)
+- **`blog-post`** — show rule: marginalia layout (40mm outer margin), page headers, fonts, equation numbering, side-captions for figures, title block, table of contents
+- **`sidenote[...]`** — unnumbered margin note
 - **`note[...]`** — numbered margin note with superscript marker
 - **`epigraph[quote][author]`** — pull quote at section openings
-- **`newthought[...]`** — small caps paragraph opener (Tufte convention)
-- **`widefig[...]`** — content extending into the margin area
+- **`newthought[...]`** — small caps paragraph opener
+- **`widefig[...]`** — content extending into the margin
 - **`notefigure(image(...))`** — figure placed entirely in the margin
 
-### Post boilerplate
+### Post Boilerplate
 
-Every post starts with:
 ```typ
 #import "../../template.typ": blog-post, sidenote, note, epigraph, newthought, widefig, notefigure
 
@@ -61,10 +84,12 @@ Every post starts with:
 
 ## Key Conventions
 
-- Images use `.webp` format, stored in `images/` subdirectory per post
-- Bibliography files are named `refs.bib` per post directory
+- Post directories: `src/posts/YYYY-MM-DD-slug/` — slug derived by stripping date prefix
+- Images: `.webp` format in `images/` subdirectory per post
+- Bibliography: `refs.bib` per post directory
 - Cross-references: `@eq:label` for equations, `@fig:label` for figures
 - Equations auto-numbered via `#set math.equation(numbering: "(1)")`
 - Figure captions appear in the margin (Tufte-style), not below the figure
 - Use `#newthought[...]` to open new conceptual sections within a heading
 - Inter font warning from marginalia is cosmetic — no action needed
+- HTML output is SVG-based (pixel-perfect match with PDF), no Pandoc needed

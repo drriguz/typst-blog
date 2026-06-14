@@ -60,6 +60,18 @@
   }
   v(0.6em)
 
+  // ─── Table of contents ───────────────────────────────────────────
+  show outline.entry.where(level: 1): it => {
+    v(0.3em)
+    strong(it)
+  }
+  block(inset: (left: 0pt, right: 0pt))[
+    #set text(size: 9pt)
+    #set par(leading: 0.6em)
+    #outline(title: [Contents], indent: 1.2em)
+  ]
+  v(0.8em)
+
   body
 }
 

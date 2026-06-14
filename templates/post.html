@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }} - drriguz{% endblock %}
+
+{% block content %}
+<div class="typst-svg">
+    {{ content | safe }}
+</div>
+{% endblock %}

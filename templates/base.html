@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="{{ lang | default(value='en') }}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Blog{% endblock %}</title>
+    <link rel="stylesheet" href="{{ root_path }}css/style.css">
+</head>
+
+<body>
+    <header class="site-header">
+        <nav style="display: flex; justify-content: space-between; align-items: center;">
+            <a href="{{ root_path }}" class="site-title">drriguz</a>
+            <div style="display: flex; gap: 1.2rem; font-size: 0.9rem;">
+                <a href="{{ root_path }}" style="text-decoration: none; color: var(--color-text);">Home</a>
+                <a href="{{ root_path }}tags-all/" style="text-decoration: none; color: var(--color-text);">Tags</a>
+                <a href="https://github.com/drriguz" target="_blank" style="text-decoration: none; color: var(--color-text);">GitHub</a>
+            </div>
+        </nav>
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <footer class="site-footer">
+        <p>Powered by <a href="https://github.com/drriguz/typst-blog">typst-blog</a> &mdash; Built with Typst</p>
+    </footer>
+</body>
+
+</html>

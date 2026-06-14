@@ -1,0 +1,160 @@
+/* typst-blog — minimal style */
+
+:root {
+    --color-text: #111;
+    --color-text-secondary: #555;
+    --color-link: #1a5276;
+    --color-link-hover: #0d2f44;
+    --color-border: #ddd;
+    --color-bg: #fffff8;
+    --color-tag-bg: #eee;
+    --color-tag-text: #555;
+    --content-width: 36rem;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 17px; -webkit-font-smoothing: antialiased; }
+
+body {
+    font-family: "New Computer Modern", "Latin Modern Roman", Georgia, serif;
+    color: var(--color-text);
+    background: var(--color-bg);
+    padding: 1.5rem;
+}
+
+a { color: var(--color-link); text-decoration: none; }
+a:hover { color: var(--color-link-hover); text-decoration: underline; }
+
+/* ─── Site header/nav ──────────────────────────────────────── */
+.site-header {
+    max-width: var(--content-width);
+    margin: 0 auto 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.85rem;
+}
+
+.site-title {
+    font-weight: 700;
+    color: var(--color-text);
+    text-decoration: none;
+}
+
+.site-title:hover { color: var(--color-link); }
+
+/* ─── Footer ───────────────────────────────────────────────── */
+.site-footer {
+    max-width: var(--content-width);
+    margin: 2rem auto 0;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--color-border);
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    text-align: center;
+}
+
+.site-footer a { color: var(--color-text-secondary); }
+
+/* ─── Index/listing pages ──────────────────────────────────── */
+main {
+    max-width: var(--content-width);
+    margin: 0 auto;
+}
+
+main:has(.typst-svg) {
+    max-width: 100%;
+}
+
+.post-list h1 {
+    margin: 0 0 1.2rem;
+    font-size: 1.3rem;
+}
+
+.post-summary {
+    margin-bottom: 1.2rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.post-summary:last-child { border-bottom: none; }
+
+.post-summary h2 {
+    font-size: 1.1rem;
+    margin: 0 0 0.15em;
+}
+
+.post-summary h2 a { color: var(--color-text); }
+.post-summary h2 a:hover { color: var(--color-link); }
+
+.post-meta {
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.summary {
+    color: var(--color-text-secondary);
+    font-size: 0.85rem;
+    margin-top: 0.2em;
+}
+
+.tag {
+    background: var(--color-tag-bg);
+    color: var(--color-tag-text);
+    padding: 0.1em 0.4em;
+    border-radius: 3px;
+    font-size: 0.7rem;
+    text-decoration: none;
+}
+
+.tag:hover {
+    background: var(--color-link);
+    color: #fff;
+    text-decoration: none;
+}
+
+/* ─── Tags cloud ───────────────────────────────────────────── */
+.tags-all h1 { margin: 0 0 1.2rem; font-size: 1.3rem; }
+
+.tags-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.tag-cloud-item { font-size: 0.8rem; padding: 0.2em 0.6em; }
+.tag-count { color: var(--color-text-secondary); font-size: 0.8em; }
+
+/* ─── Typst SVG (post content) ─────────────────────────────── */
+.typst-svg {
+    overflow-x: auto;
+}
+
+.typst-svg svg.typst-doc {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
+}
+
+.typst-svg svg.typst-doc {
+    user-select: text;
+    -webkit-user-select: text;
+}
+
+.typst-svg svg.typst-doc .typst-shape {
+    pointer-events: none;
+}
+
+.typst-svg svg.typst-doc .typst-text {
+    pointer-events: all;
+    user-select: text;
+    -webkit-user-select: text;
+}

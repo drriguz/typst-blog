@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Tag: {{ tag }} - drriguz{% endblock %}
+
+{% block content %}
+<div class="post-list">
+    <h1>Posts tagged "{{ tag }}"</h1>
+    {% for post in posts %}
+    <article class="post-summary">
+        <h2><a href="{{ root_path }}posts/{{ post.slug }}/">{{ post.title }}</a></h2>
+        <div class="post-meta">
+            <time datetime="{{ post.date }}">{{ post.date }}</time>
+            {% if post.tags %}
+            <span class="post-tags">
+                {% for t in post.tags %}
+                <a href="{{ root_path }}tags/{{ t }}/" class="tag">{{ t }}</a>
+                {% endfor %}
+            </span>
+            {% endif %}
+        </div>
+        {% if post.summary %}
+        <p class="summary">{{ post.summary }}</p>
+        {% endif %}
+    </article>
+    {% endfor %}
+</div>
+{% endblock %}
