@@ -4,7 +4,7 @@
   title: "Bayes' Theorem: Updating Beliefs with Evidence",
   date: "2026-01-15",
   tags: ("math", "probability", "statistics"),
-  author: "Riguz Lee",
+  author: "Your Name",
   summary: [A deep dive into Bayes' theorem --- from its 18th-century origins to modern applications in spam filters, medical diagnosis, and machine learning.],
 )
 

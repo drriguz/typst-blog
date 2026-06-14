@@ -11,7 +11,7 @@
   date: "",
   tags: (),
   summary: none,
-  author: "Riguz Lee",
+  author: "Your Name",
   body,
 ) = {
   // Marginalia layout
@@ -35,7 +35,7 @@
   )
 
   // Typography
-  set text(lang: "en", size: 11pt, font: ("New Computer Modern", "Songti SC"))
+  set text(lang: "en", size: 11pt, font: ("Times New Roman", "Source Han Sans SC"))
   set par(justify: true, leading: 0.8em)
   set heading(numbering: none)
   set math.equation(numbering: "(1)")
@@ -80,10 +80,10 @@
 // Unnumbered margin note (most common in Tufte style)
 #let sidenote = _note.with(counter: none)
 
-// Re-export numbered note with system font instead of Inter
+// Re-export numbered note
 #let note = _note.with(
   numbering: marginalia.note-numbering.with(
-    style: text.with(weight: 900, font: ("New Computer Modern", "Songti SC"), size: 5pt, style: "normal", fill: rgb(54%, 72%, 95%)),
+    style: text.with(weight: 900, font: ("Times New Roman", "Source Han Sans SC"), size: 5pt, style: "normal", fill: rgb(54%, 72%, 95%)),
   ),
 )
 

@@ -8,7 +8,29 @@
     <link rel="icon" href="{{ root_path }}Yoda.png" type="image/png">
     <link rel="stylesheet" href="{{ root_path }}css/style.css">
 
-
+    <style>
+        @font-face {
+            font-family: 'Source Han Sans SC';
+            src: url('/fonts/SourceHanSansSC-Regular.otf') format('opentype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'FiraMath';
+            src: url('/fonts/FiraMath-Regular.otf') format('opentype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Cascadia Code';
+            src: url('/fonts/CascadiaCode-Regular.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+    </style>
 </head>
 
 <body>
@@ -21,7 +43,7 @@
             <div class="site-nav">
                 <a href="{{ root_path }}">Home</a>
                 <a href="{{ root_path }}tags-all/">Tags</a>
-                <a href="https://github.com/drriguz" target="_blank">GitHub</a>
+                <a href="https://github.com" target="_blank">GitHub</a>
             </div>
         </nav>
     </header>
@@ -29,7 +51,7 @@
         {% block content %}{% endblock %}
     </main>
     <footer class="site-footer">
-        <p>Powered by <a href="https://github.com/drriguz/typst-blog">typst-blog</a> &mdash; Built with Typst</p>
+        <p>Powered by <a href="https://github.com/your-username/typst-blog">typst-blog</a> &mdash; Built with Typst</p>
     </footer>
 </body>
 

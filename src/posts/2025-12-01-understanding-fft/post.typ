@@ -4,7 +4,7 @@
   title: "Understanding the Fast Fourier Transform (快速傅里叶变换)",
   date: "2025-12-01",
   tags: ("math", "algorithms", "signal-processing"),
-  author: "Riguz Lee",
+  author: "Your Name",
   summary: [An introduction to the Fast Fourier Transform (FFT) --- from the DFT definition to the Cooley--Tukey algorithm, with Python code and complexity analysis.],
 )
 

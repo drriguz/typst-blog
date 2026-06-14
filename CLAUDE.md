@@ -68,7 +68,7 @@ typst watch --root . src/posts/YYYY-MM-DD-slug/post.typ
 
 ### Modified Typst Binary
 
-The `typst-modified` binary is built from the `typst-src/` submodule (fork at github.com/drriguz/typst). It renders text as SVG `<text>` elements instead of `<use>` elements, making text selectable and searchable in browsers.
+The `typst-modified` binary is built from the `typst-src/` submodule. It renders text as SVG `<text>` elements instead of `<use>` elements, making text selectable and searchable in browsers.
 
 Key changes in Typst source (`crates/typst-svg/src/text.rs`):
 - `render_text()` checks if all glyphs are outline glyphs

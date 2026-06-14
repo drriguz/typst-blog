@@ -26,13 +26,40 @@ jobs:
             typst-src/target
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-
+
+      - name: Cache fonts
+        uses: actions/cache@v4
+        with:
+          path: static/fonts
+          key: fonts-v1
+
+      - name: Download fonts
+        run: |
+          mkdir -p static/fonts
+
+          # Source Han Sans SC (Chinese)
+          [ -f static/fonts/SourceHanSansSC-Regular.otf ] || {
+            curl -sL "https://github.com/adobe-fonts/source-han-sans/releases/download/2.005R/09_SourceHanSansSC.zip" -o /tmp/shs.zip
+            unzip -j /tmp/shs.zip "*.otf" -d static/fonts/
+            rm /tmp/shs.zip
+          }
+
+          # FiraMath (Math)
+          [ -f static/fonts/FiraMath-Regular.otf ] || {
+            curl -sL "https://github.com/firamath/firamath/releases/download/v0.3.4/FiraMath-Regular.otf" -o static/fonts/FiraMath-Regular.otf
+          }
+
+          # Cascadia Code (Mono)
+          [ -f static/fonts/CascadiaCode-Regular.ttf ] || {
+            curl -sL "https://github.com/microsoft/cascadia-code/releases/download/v2407.24/CascadiaCode-2407.24.zip" -o /tmp/cascadia.zip
+            unzip -j /tmp/cascadia.zip "ttf/static/CascadiaCode-Regular.ttf" -d static/fonts/
+            rm /tmp/cascadia.zip
+          }
 
       - name: Build modified Typst
         run: |
           cd typst-src
-          cargo build --release
+          cargo build --release -p typst-cli
           cp target/release/typst ../typst-modified
 
       - name: Build blog

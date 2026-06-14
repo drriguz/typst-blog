@@ -2,8 +2,6 @@
 
 A Tufte-style static blog template powered by **Typst**. Features wide margins, sidenotes, margin figures, and epigraphs — inspired by Edward Tufte's book design.
 
-[Live Demo](https://blog.riguz.com) · [Example Post](https://blog.riguz.com/posts/bayes-theorem/)
-
 ## Features
 
 - **Tufte-style layout** — wide margins for sidenotes, figures, and annotations
@@ -32,13 +30,18 @@ cd my-blog
 ### 3. Build and preview
 
 ```bash
-# Build everything (first run compiles modified Typst, takes a few minutes)
+# Build everything (first run downloads fonts and compiles modified Typst)
 make build
 
 # Preview locally
 make serve
 # Open http://localhost:9527
 ```
+
+Fonts are downloaded automatically on first build:
+- **Source Han Sans SC** — Chinese text
+- **FiraMath** — Math symbols
+- **Cascadia Code** — Code blocks
 
 ### 4. Create your first post
 
@@ -184,6 +187,19 @@ Edit `static/css/style.css`:
 }
 ```
 
+### Fonts
+
+The blog uses these open-source fonts (downloaded automatically):
+
+| Font | Purpose | Source |
+|------|---------|--------|
+| Source Han Sans SC | Chinese text | [Adobe](https://github.com/adobe-fonts/source-han-sans) |
+| FiraMath | Math symbols | [FiraMath](https://github.com/firamath/firamath) |
+| Cascadia Code | Code blocks | [Microsoft](https://github.com/microsoft/cascadia-code) |
+| Times New Roman | English text | System font |
+
+To change fonts, edit `src/template.typ` and `templates/base.html`.
+
 ## Deployment
 
 ### GitHub Actions (recommended)
@@ -209,6 +225,8 @@ cat ~/.ssh/blog-deploy
 ```
 
 4. Push to `main` — automatic deployment!
+
+For detailed setup (server config, Nginx, permissions), see [Deployment Guide](docs/deploy-guide.md).
 
 ### Manual deployment
 

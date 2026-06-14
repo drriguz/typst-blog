@@ -3,5 +3,6 @@ output/
 target/
 typst-modified
 typst-src/target/
+static/fonts/
 _temp_body.typ
 .DS_Store
