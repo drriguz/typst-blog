@@ -9,6 +9,7 @@ pub struct PostMeta {
     pub tags: Vec<String>,
     pub lang: String,
     pub summary: String,
+    pub author: String,
     pub slug: String,
     pub source_dir: String,
 }
@@ -22,6 +23,7 @@ pub fn parse_metadata(typ_path: &Path) -> Result<PostMeta> {
     let tags_str = extract_typst_param(&content, "tags").unwrap_or_default();
     let lang = extract_typst_param(&content, "lang").unwrap_or_else(|| "en".to_string());
     let summary = extract_typst_param(&content, "summary").unwrap_or_default();
+    let author = extract_typst_param(&content, "author").unwrap_or_else(|| "Riguz Lee".to_string());
 
     let tags = parse_typst_tags(&tags_str);
 
@@ -40,6 +42,7 @@ pub fn parse_metadata(typ_path: &Path) -> Result<PostMeta> {
         tags,
         lang,
         summary,
+        author,
         slug,
         source_dir,
     })

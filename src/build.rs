@@ -67,6 +67,7 @@ pub fn build_site(root: &Path) -> Result<()> {
                         &post.tags,
                         &post.lang,
                         &post.summary,
+                        &post.author,
                         &svg_content,
                     )?;
                     std::fs::write(post_output_dir.join("index.html"), &full_html)?;

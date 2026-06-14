@@ -11,6 +11,7 @@
   date: "",
   tags: (),
   summary: none,
+  author: "Riguz Lee",
   body,
 ) = {
   // Marginalia layout
@@ -49,7 +50,7 @@
   // ─── Title block ─────────────────────────────────────────────────
   heading(level: 1, outlined: false)[#title]
   v(0.3em)
-  text(size: 9pt, fill: gray)[#date · #tags.join(", ")]
+  text(size: 9pt, fill: gray)[#author · #date · #tags.join(", ")]
   if summary != none {
     v(0.4em)
     block(inset: (left: 0pt))[

@@ -1,8 +1,13 @@
 {% extends "base.html" %}
 
-{% block title %}{{ title }} - drriguz{% endblock %}
+{% block title %}{{ title }} - 一个日牯子{% endblock %}
 
 {% block content %}
+<div class="post-meta-header">
+    <span class="post-author">{{ author }}</span>
+    <span class="post-date">{{ date }}</span>
+</div>
+
 <div class="post-tabs">
     <button class="tab-btn active" data-tab="svg">SVG</button>
     <button class="tab-btn" data-tab="html">HTML</button>
