@@ -17,20 +17,27 @@
 html { font-size: 17px; -webkit-font-smoothing: antialiased; }
 
 body {
-    font-family: "New Computer Modern", "Latin Modern Roman", "Songti SC", Georgia, "Times New Roman", serif;
+    font-family: "New Computer Modern", "STIX Two Text", "Times New Roman", "Palatino Linotype", Georgia, serif;
     color: var(--color-text);
     background: var(--color-bg);
     padding: 1.5rem;
 }
 
-/* SVG text font fallbacks - use system fonts with good CJK support */
+/* SVG text font fallbacks */
 svg text {
-    font-family: "Libertinus Serif", "New Computer Modern Math", "Latin Modern Math", "STIX Two Math", "Cambria Math", "Songti SC", Georgia, serif;
+    font-family: "Libertinus Serif", "New Computer Modern", "STIX Two Text", "Times New Roman", Georgia, serif;
+}
+
+/* Math font fallbacks (math symbols use <use> paths, but just in case) */
+svg text[font-family="New Computer Modern Math"],
+svg text[font-family="STIX Two Math"],
+svg text[font-family*="Math"] {
+    font-family: "STIX Two Math", "Cambria Math", "Latin Modern Math", "STIX", serif;
 }
 
 /* Code font fallbacks */
 svg text[font-family="DejaVu Sans Mono"] {
-    font-family: "DejaVu Sans Mono", "Fira Code", "JetBrains Mono", "Consolas", "SF Mono", monospace;
+    font-family: "Cascadia Code", "Fira Code", "JetBrains Mono", "DejaVu Sans Mono", "Consolas", monospace;
 }
 
 a { color: var(--color-link); text-decoration: none; }
