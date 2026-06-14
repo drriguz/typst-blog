@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 
 use crate::metadata::{self, PostMeta};
@@ -159,7 +159,21 @@ fn generate_tag_pages(tera: &tera::Tera, posts: &[PostMeta], output_dir: &Path) 
 
 fn run_typst(typ_path: &Path, project_root: &Path, format: &str) -> Result<()> {
     let output_path = typ_path.with_extension(format);
-    let status = Command::new("typst")
+
+    // Use modified Typst for SVG (selectable text), system Typst for PDF
+    let typst_cmd = if format == "svg" {
+        // Check for modified Typst binary in project root
+        let modified = project_root.join("typst-modified");
+        if modified.exists() {
+            modified
+        } else {
+            PathBuf::from("typst")
+        }
+    } else {
+        PathBuf::from("typst")
+    };
+
+    let status = Command::new(typst_cmd)
         .arg("compile")
         .arg("--root")
         .arg(project_root)
@@ -183,7 +197,17 @@ fn run_typst_svg(typ_path: &Path, project_root: &Path, post_dir: &Path) -> Resul
     let output_pattern = post_dir.join("post-{p}.svg");
     let output_str = output_pattern.to_str().unwrap();
 
-    let status = Command::new("typst")
+    // Use modified Typst for SVG (selectable text)
+    let typst_cmd = {
+        let modified = project_root.join("typst-modified");
+        if modified.exists() {
+            modified
+        } else {
+            PathBuf::from("typst")
+        }
+    };
+
+    let status = Command::new(typst_cmd)
         .arg("compile")
         .arg("--root")
         .arg(project_root)

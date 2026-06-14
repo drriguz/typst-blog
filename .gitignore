@@ -1,5 +1,7 @@
 *.pdf
 output/
 target/
+typst-modified
+typst-src/target/
 _temp_body.typ
 .DS_Store

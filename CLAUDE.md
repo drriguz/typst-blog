@@ -4,12 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-A Tufte-style static blog generator powered by **Typst**. Posts are written in Typst with the [marginalia](https://typst.app/universe/package/marginalia) package for wide margins, sidenotes, and margin figures. A Rust CLI compiles posts into PDF and HTML (via Typst SVG) with an index page.
+A Tufte-style static blog generator powered by **Typst**. Posts are written in Typst with the [marginalia](https://typst.app/universe/package/marginalia) package for wide margins, sidenotes, and margin figures. A Rust CLI compiles posts into PDF and HTML (SVG with selectable text) with an index page.
 
 ## Build Commands
 
 ```bash
-make build              # Build the static site (cargo run -- build)
+make build              # Build the static site (builds modified Typst automatically)
+make typst-modified     # Build the modified Typst binary from submodule
 make serve              # Dev server on port 9527 (cargo run -- serve --port 9527)
 make clean              # Remove output/
 make new                # Interactive new post creation (or: cargo run -- new "Title" --tags "tag1,tag2")
@@ -23,6 +24,11 @@ Typst-only (without the site generator):
 typst compile --root . src/posts/YYYY-MM-DD-slug/post.typ
 typst watch --root . src/posts/YYYY-MM-DD-slug/post.typ
 ```
+
+## Prerequisites
+
+- **Rust** (1.70+): <https://rustup.rs/>
+- **Git submodules**: `git submodule update --init --recursive`
 
 ## Project Structure
 
@@ -39,9 +45,12 @@ typst watch --root . src/posts/YYYY-MM-DD-slug/post.typ
 │   └── new-post.typ              # Scaffold for `typst-blog new`
 ├── static/css/style.css          # Site stylesheet
 ├── src/                          # Rust CLI source (main.rs, build.rs, metadata.rs, template.rs, server.rs)
+├── typst-src/                    # Git submodule: modified Typst source
 ├── output/                       # Generated static site (gitignored)
+├── typst-modified                # Built from typst-src/ (gitignored)
 ├── Cargo.toml
-└── Makefile
+├── Makefile
+└── .github/workflows/build.yml   # CI/CD pipeline
 ```
 
 ## Architecture
@@ -51,11 +60,22 @@ typst watch --root . src/posts/YYYY-MM-DD-slug/post.typ
 1. Scan `src/posts/*/post.typ` for metadata (title, date, tags, summary via regex)
 2. Sort posts by date descending
 3. Per post:
-   - **PDF**: `typst compile --root . --format pdf` → copy to `output/posts/<slug>/post.pdf`
-   - **HTML**: `typst compile --root . --format svg` → one SVG per page → embedded in Tera HTML template
+   - **PDF**: `typst compile --root . --format pdf` → full Tufte layout with marginalia
+   - **SVG**: `typst-modified compile --root . --format svg` → selectable text via `<text>` elements
    - **Images**: copy `images/` to `output/posts/<slug>/images/`
 4. Generate `output/index.html` and `output/tags/<tag>/index.html`
 5. Copy `static/` to `output/`
+
+### Modified Typst Binary
+
+The `typst-modified` binary is built from the `typst-src/` submodule (fork at github.com/drriguz/typst). It renders text as SVG `<text>` elements instead of `<use>` elements, making text selectable and searchable in browsers.
+
+Key changes in Typst source (`crates/typst-svg/src/text.rs`):
+- `render_text()` checks if all glyphs are outline glyphs
+- If so, calls `render_text_as_svg_text()` which emits `<text>` with `<tspan>` children
+- Falls back to `<use>` elements for color/image glyphs
+
+Build: `make typst-modified` (compiles from `typst-src/` submodule)
 
 ### Typst Template (`src/template.typ`)
 
@@ -92,4 +112,4 @@ All posts import from this shared template. It provides:
 - Figure captions appear in the margin (Tufte-style), not below the figure
 - Use `#newthought[...]` to open new conceptual sections within a heading
 - Inter font warning from marginalia is cosmetic — no action needed
-- HTML output is SVG-based (pixel-perfect match with PDF), no Pandoc needed
+- SVG output uses modified Typst for selectable text

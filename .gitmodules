@@ -1,0 +1,3 @@
+[submodule "typst-src"]
+	path = typst-src
+	url = git@github.com:drriguz/typst.git
