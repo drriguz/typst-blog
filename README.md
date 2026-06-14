@@ -1,65 +1,66 @@
 # typst-blog
 
-A Tufte-style static blog generator powered by **Typst**. Write posts in Typst with wide margins, sidenotes, margin figures, and epigraphs — inspired by Edward Tufte's book design.
+A Tufte-style static blog template powered by **Typst**. Features wide margins, sidenotes, margin figures, and epigraphs — inspired by Edward Tufte's book design.
+
+[Live Demo](https://blog.riguz.com) · [Example Post](https://blog.riguz.com/posts/bayes-theorem/)
 
 ## Features
 
-- Tufte-style PDF output via [marginalia](https://typst.app/universe/package/marginalia): wide margins, sidenotes, margin figures, side-captions
-- HTML output via Typst SVG with **selectable text** (modified Typst compiler)
-- Epigraphs, small caps (`newthought`), numbered equations
-- Bibliography support (BibTeX)
-- Tag-based organization with index and tag pages
-- CLI for creating new posts, building, and previewing
-
-## Prerequisites
-
-- **Rust** (1.70+): <https://rustup.rs/>
-- **Git submodules**: `git submodule update --init --recursive`
+- **Tufte-style layout** — wide margins for sidenotes, figures, and annotations
+- **PDF + HTML output** — PDF for download, HTML with selectable text for browsing
+- **Math support** — equations rendered beautifully with Typst
+- **Bibliography** — BibTeX citations support
+- **Tags** — organize posts with tag-based navigation
+- **Auto deploy** — GitHub Actions builds and deploys on push
 
 ## Quick Start
 
-```bash
-# Clone with submodules
-git clone --recursive https://github.com/drriguz/typst-blog.git
-cd typst-blog
+### 1. Use this template
 
-# Build the static site (builds modified Typst automatically)
+Click "Use this template" on GitHub, or clone:
+
+```bash
+git clone --recursive https://github.com/YOUR_USERNAME/typst-blog.git my-blog
+cd my-blog
+```
+
+### 2. Install prerequisites
+
+- [Rust](https://rustup.rs/) (1.70+)
+- [Git](https://git-scm.com/) (for submodules)
+
+### 3. Build and preview
+
+```bash
+# Build everything (first run compiles modified Typst, takes a few minutes)
 make build
 
-# Preview locally at http://localhost:9527
+# Preview locally
 make serve
-
-# Create a new post
-make new
-
-# Build then serve
-make dev
+# Open http://localhost:9527
 ```
 
-Or use cargo directly (requires `typst-modified` binary):
+### 4. Create your first post
 
 ```bash
-# Build modified Typst first
-make typst-modified
-
-# Then build blog
-cargo run -- new "My Post Title" --tags "math,algorithms"
-cargo run -- build
-cargo run -- serve --port 9527
+make new
+# Enter title when prompted
 ```
 
-## Writing a Post
+This creates `src/posts/YYYY-MM-DD-your-title/post.typ`. Edit it and rebuild.
+
+## Writing Posts
 
 Each post lives in `src/posts/YYYY-MM-DD-slug/`:
 
 ```
-src/posts/2026-01-15-bayes-theorem/
+src/posts/2026-01-15-my-post/
 ├── post.typ      # Post content
-├── refs.bib      # Bibliography
-└── images/       # Post-local images (.webp)
+├── refs.bib      # Bibliography (optional)
+└── images/       # Images (optional)
 ```
 
-A post starts with:
+### Post template
 
 ```typ
 #import "../../template.typ": blog-post, sidenote, note, epigraph, newthought, widefig, notefigure
@@ -67,24 +68,45 @@ A post starts with:
 #show: blog-post.with(
   title: "My Post Title",
   date: "2026-01-15",
-  tags: ("math", "probability"),
-  summary: [A brief description.],
+  tags: ("topic1", "topic2"),
+  author: "Your Name",
+  summary: [Brief description shown on index page.],
 )
 
 = Introduction
 
-Write your content here. Use #sidenote[margin notes] for tangential context.
+Your content here. Use #sidenote[margin notes] for side comments.
+
+= Math Example
+
+Inline math: $E = m c^2$
+
+Display math with numbering:
+$ integral_0^infinity e^{-x^2} dif x = sqrt(pi) / 2 $ <eq:gauss>
+
+Reference equations: see @eq:gauss.
+
+= Code
+
+```python
+def hello():
+    print("Hello, World!")
 ```
 
-### Template Helpers
+= Conclusion
+
+Wrap up your post here.
+```
+
+### Available helpers
 
 | Function | Description |
 |---|---|
-| `sidenote[...]` | Unnumbered margin note |
-| `note[...]` | Numbered margin note |
-| `epigraph[quote][author]` | Pull quote at section openings |
-| `newthought[...]` | Small caps paragraph opener |
-| `widefig[...]` | Content extending into the margin |
+| `sidenote[text]` | Unnumbered margin note |
+| `note[text]` | Numbered margin note |
+| `epigraph[quote][author]` | Pull quote at section opening |
+| `newthought[text]` | Small caps paragraph opener |
+| `widefig[content]` | Content extending into margin |
 | `notefigure(image(...))` | Figure in the margin |
 
 ### Images
@@ -93,69 +115,145 @@ Write your content here. Use #sidenote[margin notes] for tangential context.
 // Margin figure
 #notefigure(
   image("images/diagram.webp"),
-  caption: [A small figure in the margin.],
+  caption: [Description.],
 )
 
 // Wide figure (extends into margin)
 #widefig[
   #figure(
     image("images/chart.webp"),
-    caption: [A wide figure.],
+    caption: [Description.],
   )
 ]
 ```
 
-### Math
+### Citations
 
-```typ
-Inline: $E = m c^2$
+Add references to `refs.bib`:
 
-Display (auto-numbered):
-$ integral_{-infinity}^{infinity} e^{-x^2} dif x = sqrt(pi) $ <eq:gauss>
-
-Reference: see @eq:gauss.
+```bibtex
+@book{knuth1997,
+  author = {Knuth, Donald E.},
+  title = {The Art of Computer Programming},
+  year = {1997},
+}
 ```
 
-### Citations
+Cite in your post:
 
 ```typ
 According to @knuth1997, ...
-
-#bibliography("refs.bib", style: "ieee")
 ```
 
-## Build Pipeline
+## Customize
 
-1. Scan `src/posts/*/post.typ` for metadata
-2. Per post: Typst → PDF (full Tufte layout) + SVG (selectable text)
-3. SVGs embedded in HTML template
-4. Generate index and tag pages
-5. Copy images and static assets to `output/`
+### Change site name and author
 
-## SVG Text Selection
+Edit `templates/base.html`:
 
-The HTML output uses a modified Typst compiler that renders text as SVG `<text>` elements instead of `<use>` elements referencing glyph shapes. This makes the text:
+```html
+<a href="{{ root_path }}" class="site-title">
+    <img src="{{ root_path }}Yoda.png" alt="Logo" class="site-logo">
+    Your Blog Name
+</a>
+```
 
-- **Selectable** — users can select and copy text
-- **Searchable** — browser find (Ctrl+F) works
-- **Accessible** — screen readers can read the text
+Edit `src/template.typ` default author:
 
-To use this feature, place the modified Typst binary as `typst-modified` in the project root.
+```typ
+#let blog-post(
+  ...
+  author: "Your Name",
+  ...
+)
+```
+
+### Change logo
+
+Replace `static/Yoda.png` with your own image.
+
+### Change colors
+
+Edit `static/css/style.css`:
+
+```css
+:root {
+    --color-link: #1a5276;        /* Link color */
+    --color-bg: #fffff8;          /* Background */
+    --content-width: 36rem;       /* Text width */
+}
+```
+
+## Deployment
+
+### GitHub Actions (recommended)
+
+1. Go to repo → Settings → Secrets → Actions
+2. Add these secrets:
+
+| Secret | Description | Example |
+|--------|-------------|---------|
+| `DEPLOY_HOST` | Server hostname | `example.com` |
+| `DEPLOY_PORT` | SSH port | `22` |
+| `DEPLOY_USER` | SSH username | `deploy` |
+| `DEPLOY_PATH` | Remote directory | `/var/www/blog/` |
+| `DEPLOY_KEY` | SSH private key | See below |
+
+3. Generate SSH key:
+
+```bash
+ssh-keygen -t ed25519 -C "github-deploy" -f ~/.ssh/blog-deploy
+ssh-copy-id -i ~/.ssh/blog-deploy.pub user@your-server
+# Copy private key content to DEPLOY_KEY secret
+cat ~/.ssh/blog-deploy
+```
+
+4. Push to `main` — automatic deployment!
+
+### Manual deployment
+
+```bash
+make build
+rsync -avzr --delete output/ user@server:/var/www/blog/
+```
+
+## Commands
+
+```bash
+make build          # Build the site
+make serve          # Preview at http://localhost:9527
+make new            # Create new post
+make dev            # Build + serve
+make clean          # Remove output/
+make deploy         # Build + deploy via rsync
+```
 
 ## Project Structure
 
 ```
 ├── src/
-│   ├── template.typ              # Shared Tufte-style template
+│   ├── template.typ              # Tufte-style Typst template
 │   └── posts/YYYY-MM-DD-slug/   # Blog posts
-├── templates/                    # HTML templates (Tera)
-├── static/css/style.css          # Site stylesheet
-├── src/                          # Rust CLI source
-├── output/                       # Generated site (gitignored)
-├── typst-modified                # Modified Typst binary (selectable text)
-├── Cargo.toml
-└── Makefile
+├── templates/                    # HTML templates
+├── static/                       # CSS, images, fonts
+├── typst-src/                    # Modified Typst (git submodule)
+├── .github/workflows/            # CI/CD
+├── Cargo.toml                    # Rust dependencies
+└── Makefile                      # Build commands
 ```
+
+## How it works
+
+1. Posts are written in Typst (`.typ` files)
+2. Modified Typst compiler generates SVG with selectable text
+3. SVG is embedded in HTML template with navigation
+4. PDF is also generated for download
+5. GitHub Actions builds and deploys on push
+
+## Requirements
+
+- **Rust** 1.70+
+- **Typst** (bundled as submodule, no separate install needed)
 
 ## License
 

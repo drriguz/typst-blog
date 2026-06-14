@@ -1,4 +1,4 @@
-.PHONY: build serve clean new dev typst
+.PHONY: build serve clean new dev typst deploy
 
 # Build the blog (requires typst-modified binary)
 build: typst-modified
@@ -26,3 +26,7 @@ new:
 
 # Build then serve
 dev: build serve
+
+# Deploy via rsync (set DEPLOY_TARGET in .env or environment)
+deploy: build
+	rsync -avzr --delete output/ $(DEPLOY_TARGET)
