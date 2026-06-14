@@ -72,7 +72,7 @@ pub fn render_tags_all(
 
     let mut ctx = Context::new();
     ctx.insert("tags", &tags);
-    ctx.insert("root_path", "");
+    ctx.insert("root_path", "../");
     ctx.insert("lang", "en");
     let html = tera.render("tags-all.html", &ctx)?;
     Ok(html)

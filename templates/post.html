@@ -3,7 +3,33 @@
 {% block title %}{{ title }} - drriguz{% endblock %}
 
 {% block content %}
-<div class="typst-svg">
-    {{ content | safe }}
+<div class="post-tabs">
+    <button class="tab-btn active" data-tab="svg">SVG</button>
+    <button class="tab-btn" data-tab="html">HTML</button>
+    <a href="post.pdf" class="tab-btn" target="_blank">PDF</a>
 </div>
+
+<div id="tab-svg" class="tab-content active">
+    <div class="typst-svg">
+        {{ content | safe }}
+    </div>
+</div>
+
+<div id="tab-html" class="tab-content">
+    <div class="placeholder">
+        <p>HTML view coming soon.</p>
+        <p><a href="post.pdf">Download PDF</a> for the full formatted version.</p>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.tab-btn[data-tab]').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+});
+</script>
 {% endblock %}

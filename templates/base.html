@@ -12,12 +12,15 @@
 
 <body>
     <header class="site-header">
-        <nav style="display: flex; justify-content: space-between; align-items: center;">
-            <a href="{{ root_path }}" class="site-title">drriguz</a>
-            <div style="display: flex; gap: 1.2rem; font-size: 0.9rem;">
-                <a href="{{ root_path }}" style="text-decoration: none; color: var(--color-text);">Home</a>
-                <a href="{{ root_path }}tags-all/" style="text-decoration: none; color: var(--color-text);">Tags</a>
-                <a href="https://github.com/drriguz" target="_blank" style="text-decoration: none; color: var(--color-text);">GitHub</a>
+        <nav>
+            <a href="{{ root_path }}" class="site-title">
+                <img src="{{ root_path }}logo.svg" alt="Logo" class="site-logo">
+                drriguz
+            </a>
+            <div class="site-nav">
+                <a href="{{ root_path }}">Home</a>
+                <a href="{{ root_path }}tags-all/">Tags</a>
+                <a href="https://github.com/drriguz" target="_blank">GitHub</a>
             </div>
         </nav>
     </header>
