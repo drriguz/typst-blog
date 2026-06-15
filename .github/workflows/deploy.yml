@@ -27,27 +27,14 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - name: Install fonts to system
+      - name: Install fonts
         run: |
-          mkdir -p /tmp/fonts
-
-          # Source Han Sans SC (Chinese)
-          curl -sL "https://github.com/adobe-fonts/source-han-sans/releases/download/2.005R/09_SourceHanSansSC.zip" -o /tmp/shs.zip
-          unzip -j /tmp/shs.zip "*.otf" -d /tmp/fonts/
-          rm /tmp/shs.zip
-
-          # FiraMath (Math)
-          curl -sL "https://github.com/firamath/firamath/releases/download/v0.3.4/FiraMath-Regular.otf" -o /tmp/fonts/FiraMath-Regular.otf
-
-          # Cascadia Code (Mono)
-          curl -sL "https://github.com/microsoft/cascadia-code/releases/download/v2407.24/CascadiaCode-2407.24.zip" -o /tmp/cascadia.zip
-          unzip -j /tmp/cascadia.zip "ttf/static/CascadiaCode-Regular.ttf" -d /tmp/fonts/
-          rm /tmp/cascadia.zip
-
-          # Install to system font directory
-          sudo mkdir -p /usr/local/share/fonts/custom
-          sudo cp /tmp/fonts/* /usr/local/share/fonts/custom/
-          sudo fc-cache -fv
+          sudo apt-get update
+          sudo apt-get install -y \
+            fonts-libertinus \
+            fonts-new-computer-modern \
+            fonts-cascadia-code \
+            fonts-noto-cjk
 
       - name: Cache modified Typst
         id: cache-typst

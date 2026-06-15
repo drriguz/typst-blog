@@ -75,13 +75,33 @@ Key changes in Typst source (`crates/typst-svg/src/text.rs`):
 - If so, calls `render_text_as_svg_text()` which emits `<text>` with `<tspan>` children
 - Falls back to `<use>` elements for color/image glyphs
 
+**Math font constraint:** Fonts with a MATH table (e.g., "New Computer Modern Math") must always be rendered as shapes (`<use>` with `<path>` elements), never as `<text>` elements. Browsers typically don't have math fonts installed, so `<text>` with a math `font-family` won't render correctly. The `render_text()` method checks `FontFlags::MATH` and forces the glyph path for math fonts.
+
 Build: `make typst-modified` (compiles from `typst-src/` submodule)
+
+### Fonts
+
+Installed via `apt-get` (CI) or `make fonts` (local dev):
+
+| Role        | Font                      | apt package                  |
+|-------------|---------------------------|------------------------------|
+| Main serif  | Libertinus Serif          | `fonts-libertinus`           |
+| CJK serif   | Noto Serif CJK SC         | `fonts-noto-cjk`             |
+| Sans        | New Computer Modern       | `fonts-new-computer-modern`  |
+| CJK sans    | Noto Sans CJK SC          | `fonts-noto-cjk`             |
+| Mono        | Cascadia Code             | `fonts-cascadia-code`        |
+| Math        | New Computer Modern Math  | `fonts-new-computer-modern`  |
+
+CSS fallbacks for HTML (fonts not served as web fonts):
+- Serif: `Georgia, serif`
+- Sans: `Arial, Helvetica, sans-serif`
+- Mono: `Consolas, monospace`
 
 ### Typst Template (`src/template.typ`)
 
 All posts import from this shared template. It provides:
 
-- **`blog-post`** — show rule: marginalia layout (40mm outer margin), page headers, fonts, equation numbering, side-captions for figures, title block, table of contents
+- **`blog-post`** — show rule: marginalia layout (40mm outer margin), page headers, fonts (Libertinus Serif + Noto Serif CJK SC), equation numbering, side-captions for figures, title block, table of contents
 - **`sidenote[...]`** — unnumbered margin note
 - **`note[...]`** — numbered margin note with superscript marker
 - **`epigraph[quote][author]`** — pull quote at section openings
