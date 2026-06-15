@@ -34,8 +34,8 @@
     },
   )
 
-  // Typography - Libertinus Serif with CJK fallback
-  set text(lang: "en", size: 11pt, font: ("Libertinus Serif", "Noto Serif CJK SC"))
+  // Typography - Linux Libertine with CJK fallback
+  set text(lang: "en", size: 11pt, font: ("Linux Libertine O", "Noto Serif CJK SC"))
   set par(justify: true, leading: 0.8em)
   set heading(numbering: none)
   set math.equation(numbering: "(1)")
@@ -83,7 +83,7 @@
 // Re-export numbered note
 #let note = _note.with(
   numbering: marginalia.note-numbering.with(
-    style: text.with(weight: 900, font: ("Libertinus Serif", "Noto Serif CJK SC"), size: 5pt, style: "normal", fill: rgb(54%, 72%, 95%)),
+    style: text.with(weight: 900, font: ("Linux Libertine O", "Noto Serif CJK SC"), size: 5pt, style: "normal", fill: rgb(54%, 72%, 95%)),
   ),
 )
 

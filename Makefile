@@ -15,8 +15,8 @@ typst-modified:
 fonts:
 	sudo apt-get update
 	sudo apt-get install -y \
-		fonts-libertinus \
-		fonts-new-computer-modern \
+		fonts-linuxlibertine \
+		fonts-cmu \
 		fonts-cascadia-code \
 		fonts-noto-cjk
 

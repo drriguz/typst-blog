@@ -83,14 +83,14 @@ Build: `make typst-modified` (compiles from `typst-src/` submodule)
 
 Installed via `apt-get` (CI) or `make fonts` (local dev):
 
-| Role        | Font                      | apt package                  |
-|-------------|---------------------------|------------------------------|
-| Main serif  | Libertinus Serif          | `fonts-libertinus`           |
-| CJK serif   | Noto Serif CJK SC         | `fonts-noto-cjk`             |
-| Sans        | New Computer Modern       | `fonts-new-computer-modern`  |
-| CJK sans    | Noto Sans CJK SC          | `fonts-noto-cjk`             |
-| Mono        | Cascadia Code             | `fonts-cascadia-code`        |
-| Math        | New Computer Modern Math  | `fonts-new-computer-modern`  |
+| Role        | Font                      | apt package            |
+|-------------|---------------------------|------------------------|
+| Main serif  | Linux Libertine O         | `fonts-linuxlibertine` |
+| CJK serif   | Noto Serif CJK SC         | `fonts-noto-cjk`       |
+| Sans        | CMU Sans Serif            | `fonts-cmu`            |
+| CJK sans    | Noto Sans CJK SC          | `fonts-noto-cjk`       |
+| Mono        | Cascadia Code             | `fonts-cascadia-code`  |
+| Math        | CMU Math                  | `fonts-cmu`            |
 
 CSS fallbacks for HTML (fonts not served as web fonts):
 - Serif: `Georgia, serif`
@@ -101,7 +101,7 @@ CSS fallbacks for HTML (fonts not served as web fonts):
 
 All posts import from this shared template. It provides:
 
-- **`blog-post`** — show rule: marginalia layout (40mm outer margin), page headers, fonts (Libertinus Serif + Noto Serif CJK SC), equation numbering, side-captions for figures, title block, table of contents
+- **`blog-post`** — show rule: marginalia layout (40mm outer margin), page headers, fonts (Linux Libertine O + Noto Serif CJK SC), equation numbering, side-captions for figures, title block, table of contents
 - **`sidenote[...]`** — unnumbered margin note
 - **`note[...]`** — numbered margin note with superscript marker
 - **`epigraph[quote][author]`** — pull quote at section openings

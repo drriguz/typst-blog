@@ -17,7 +17,7 @@
 html { font-size: 17px; -webkit-font-smoothing: antialiased; }
 
 body {
-    font-family: "Libertinus Serif", Georgia, "Noto Serif CJK SC", serif;
+    font-family: "Linux Libertine O", Georgia, "Noto Serif CJK SC", serif;
     color: var(--color-text);
     background: var(--color-bg);
     padding: 1.5rem;
@@ -25,7 +25,7 @@ body {
 
 /* SVG text font fallbacks */
 svg text {
-    font-family: "Libertinus Serif", Georgia, "Noto Serif CJK SC", serif;
+    font-family: "Linux Libertine O", Georgia, "Noto Serif CJK SC", serif;
 }
 
 /* Code font fallbacks */
