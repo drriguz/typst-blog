@@ -17,16 +17,6 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Cache cargo
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            typst-src/target
-            target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-
       - name: Install fonts
         run: |
           sudo apt-get update
@@ -36,12 +26,16 @@ jobs:
             fonts-cascadia-code \
             fonts-noto-cjk
 
+      - name: Get submodule revision
+        id: submodule
+        run: echo "rev=$(git rev-parse HEAD:typst-src)" >> "$GITHUB_OUTPUT"
+
       - name: Cache modified Typst
         id: cache-typst
         uses: actions/cache@v4
         with:
           path: /usr/local/bin/typst
-          key: typst-modified-${{ hashFiles('typst-src/Cargo.lock') }}
+          key: typst-modified-${{ steps.submodule.outputs.rev }}
 
       - name: Build modified Typst
         if: steps.cache-typst.outputs.cache-hit != 'true'

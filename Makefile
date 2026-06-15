@@ -18,6 +18,7 @@ serve:
 # Clean output
 clean:
 	cargo run -- clean
+	rm -f typst-modified
 
 # Create new post
 new:
