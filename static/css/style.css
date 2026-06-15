@@ -17,7 +17,7 @@
 html { font-size: 17px; -webkit-font-smoothing: antialiased; }
 
 body {
-    font-family: "Times New Roman", "Source Han Sans SC", Georgia, serif;
+    font-family: "Liberation Serif", "Times New Roman", "Source Han Sans SC", Georgia, serif;
     color: var(--color-text);
     background: var(--color-bg);
     padding: 1.5rem;
@@ -25,7 +25,7 @@ body {
 
 /* SVG text font fallbacks */
 svg text {
-    font-family: "Times New Roman", "Source Han Sans SC", Georgia, serif;
+    font-family: "Liberation Serif", "Times New Roman", "Source Han Sans SC", Georgia, serif;
 }
 
 /* Math font fallbacks */

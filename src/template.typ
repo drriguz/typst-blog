@@ -34,8 +34,8 @@
     },
   )
 
-  // Typography
-  set text(lang: "en", size: 11pt, font: ("Times New Roman", "Source Han Sans SC"))
+  // Typography - Liberation Serif is metrically compatible with Times New Roman
+  set text(lang: "en", size: 11pt, font: ("Liberation Serif", "Source Han Sans SC"))
   set par(justify: true, leading: 0.8em)
   set heading(numbering: none)
   set math.equation(numbering: "(1)")
@@ -83,7 +83,7 @@
 // Re-export numbered note
 #let note = _note.with(
   numbering: marginalia.note-numbering.with(
-    style: text.with(weight: 900, font: ("Times New Roman", "Source Han Sans SC"), size: 5pt, style: "normal", fill: rgb(54%, 72%, 95%)),
+    style: text.with(weight: 900, font: ("Liberation Serif", "Source Han Sans SC"), size: 5pt, style: "normal", fill: rgb(54%, 72%, 95%)),
   ),
 )
 
