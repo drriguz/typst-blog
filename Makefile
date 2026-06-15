@@ -1,7 +1,7 @@
-.PHONY: build serve clean new dev typst deploy fonts
+.PHONY: build serve clean new dev typst deploy
 
 # Build the blog
-build: typst-modified fonts
+build: typst-modified
 	cargo run -- build
 
 # Build the modified Typst binary from submodule
@@ -10,15 +10,6 @@ typst-modified:
 	cd typst-src && cargo build --release
 	cp typst-src/target/release/typst typst-modified
 	@echo "Built typst-modified"
-
-# Install fonts for local development (requires apt-get on Linux)
-fonts:
-	sudo apt-get update
-	sudo apt-get install -y \
-		fonts-linuxlibertine \
-		fonts-cmu \
-		fonts-cascadia-code \
-		fonts-noto-cjk
 
 # Serve locally
 serve:
