@@ -49,7 +49,15 @@ jobs:
           sudo cp /tmp/fonts/* /usr/local/share/fonts/custom/
           sudo fc-cache -fv
 
+      - name: Cache modified Typst
+        id: cache-typst
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/bin/typst
+          key: typst-modified-${{ hashFiles('typst-src/Cargo.lock') }}
+
       - name: Build modified Typst
+        if: steps.cache-typst.outputs.cache-hit != 'true'
         run: |
           cd typst-src
           cargo build --release -p typst-cli
