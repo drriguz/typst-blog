@@ -12,7 +12,7 @@ pub fn serve(output_dir: &Path, port: u16) -> Result<()> {
 
     for request in server.incoming_requests() {
         let url_path = request.url().to_string();
-        let url_path = url_path.trim_start_matches('/');
+        let url_path = percent_decode(url_path.trim_start_matches('/'));
 
         let file_path = if url_path.is_empty() {
             output_dir.join("index.html")
@@ -82,6 +82,33 @@ pub fn serve(output_dir: &Path, port: u16) -> Result<()> {
     }
 
     Ok(())
+}
+
+fn percent_decode(input: &str) -> String {
+    let mut output = Vec::new();
+    let bytes = input.as_bytes();
+    let mut i = 0;
+    while i < bytes.len() {
+        if bytes[i] == b'%' && i + 2 < bytes.len() {
+            if let (Ok(h), Ok(l)) = (hex_val(bytes[i + 1]), hex_val(bytes[i + 2])) {
+                output.push(h * 16 + l);
+                i += 3;
+                continue;
+            }
+        }
+        output.push(bytes[i]);
+        i += 1;
+    }
+    String::from_utf8(output).unwrap_or_else(|_| input.to_string())
+}
+
+fn hex_val(b: u8) -> Result<u8, ()> {
+    match b {
+        b'0'..=b'9' => Ok(b - b'0'),
+        b'a'..=b'f' => Ok(b - b'a' + 10),
+        b'A'..=b'F' => Ok(b - b'A' + 10),
+        _ => Err(()),
+    }
 }
 
 fn guess_content_type(path: &Path) -> String {

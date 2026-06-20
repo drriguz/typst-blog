@@ -5,6 +5,8 @@ use std::process::Command;
 use crate::metadata::{self, PostMeta};
 use crate::template;
 
+const POSTS_PER_PAGE: usize = 10;
+
 pub fn build_site(root: &Path) -> Result<()> {
     let posts_dir = root.join("src").join("posts");
     let output_dir = root.join("output");
@@ -87,12 +89,11 @@ pub fn build_site(root: &Path) -> Result<()> {
         println!("  -> Done: posts/{}/", post.slug);
     }
 
-    // Generate index page
-    println!("[index] Generating index page ...");
-    let index_html = template::render_index(&tera, &posts)?;
-    std::fs::write(output_dir.join("index.html"), &index_html)?;
+    // Generate paginated index pages
+    println!("[index] Generating index pages ...");
+    generate_paginated_index(&tera, &posts, &output_dir)?;
 
-    // Generate tag pages
+    // Generate paginated tag pages
     println!("[tags] Generating tag pages ...");
     generate_tag_pages(&tera, &posts, &output_dir)?;
 
@@ -128,6 +129,32 @@ fn discover_posts(posts_dir: &Path) -> Result<Vec<PostMeta>> {
     Ok(posts)
 }
 
+fn generate_paginated_index(
+    tera: &tera::Tera,
+    posts: &[PostMeta],
+    output_dir: &Path,
+) -> Result<()> {
+    let total_pages = (posts.len() + POSTS_PER_PAGE - 1) / POSTS_PER_PAGE;
+
+    for page in 1..=total_pages {
+        let start = (page - 1) * POSTS_PER_PAGE;
+        let end = (start + POSTS_PER_PAGE).min(posts.len());
+        let page_posts = &posts[start..end];
+
+        let html = template::render_index(tera, page_posts, page, total_pages)?;
+
+        if page == 1 {
+            std::fs::write(output_dir.join("index.html"), html)?;
+        } else {
+            let page_dir = output_dir.join("page").join(page.to_string());
+            std::fs::create_dir_all(&page_dir)?;
+            std::fs::write(page_dir.join("index.html"), html)?;
+        }
+    }
+
+    Ok(())
+}
+
 fn generate_tag_pages(tera: &tera::Tera, posts: &[PostMeta], output_dir: &Path) -> Result<()> {
     use std::collections::HashMap;
     let mut tag_map: HashMap<String, Vec<PostMeta>> = HashMap::new();
@@ -139,10 +166,25 @@ fn generate_tag_pages(tera: &tera::Tera, posts: &[PostMeta], output_dir: &Path) 
     }
 
     for (tag, tag_posts) in &tag_map {
-        let tag_dir = output_dir.join("tags").join(tag);
-        std::fs::create_dir_all(&tag_dir)?;
-        let html = template::render_tag_index(tera, tag, tag_posts)?;
-        std::fs::write(tag_dir.join("index.html"), html)?;
+        let total_pages = (tag_posts.len() + POSTS_PER_PAGE - 1) / POSTS_PER_PAGE;
+
+        for page in 1..=total_pages {
+            let start = (page - 1) * POSTS_PER_PAGE;
+            let end = (start + POSTS_PER_PAGE).min(tag_posts.len());
+            let page_posts = &tag_posts[start..end];
+
+            let html = template::render_tag_index(tera, tag, page_posts, page, total_pages)?;
+
+            if page == 1 {
+                let tag_dir = output_dir.join("tags").join(tag);
+                std::fs::create_dir_all(&tag_dir)?;
+                std::fs::write(tag_dir.join("index.html"), html)?;
+            } else {
+                let page_dir = output_dir.join("tags").join(tag).join("page").join(page.to_string());
+                std::fs::create_dir_all(&page_dir)?;
+                std::fs::write(page_dir.join("index.html"), html)?;
+            }
+        }
     }
 
     // Generate tags-all page

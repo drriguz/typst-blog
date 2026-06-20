@@ -7,7 +7,7 @@
     <h1>Posts</h1>
     {% for post in posts %}
     <article class="post-summary">
-        <h2><a href="posts/{{ post.slug }}/">{{ post.title }}</a></h2>
+        <h2><a href="{{ root_path }}posts/{{ post.slug }}/">{{ post.title }}</a></h2>
         <div class="post-meta">
             <time datetime="{{ post.date }}">{{ post.date }}</time>
             {% if post.tags %}
@@ -24,4 +24,27 @@
     </article>
     {% endfor %}
 </div>
+{% if total_pages > 1 %}
+<nav class="pagination">
+    {% if has_prev %}
+    <a href="{{ prev_url }}" class="page-arrow">&laquo;</a>
+    {% else %}
+    <span class="page-arrow disabled">&laquo;</span>
+    {% endif %}
+    {% for p in page_links %}
+        {% if p.num == 0 %}
+        <span class="page-num ellipsis">&hellip;</span>
+        {% elif p.num == current_page %}
+        <span class="page-num active">{{ p.num }}</span>
+        {% else %}
+        <a href="{{ p.url }}" class="page-num">{{ p.num }}</a>
+        {% endif %}
+    {% endfor %}
+    {% if has_next %}
+    <a href="{{ next_url }}" class="page-arrow">&raquo;</a>
+    {% else %}
+    <span class="page-arrow disabled">&raquo;</span>
+    {% endif %}
+</nav>
+{% endif %}
 {% endblock %}
