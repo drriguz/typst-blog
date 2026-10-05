@@ -67,7 +67,7 @@
   date: "",
   tags: (),
   summary: none,
-  author: "Your Name",
+  author: sys.inputs.at("author", default: "Author"),
   body,
 ) = {
   // Marginalia layout (paged only; in HTML export the page set rule

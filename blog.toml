@@ -1,0 +1,5 @@
+# Site-wide settings for typst-blog.
+# The author is shown in each post's title block and in document metadata
+# (HTML <meta> tags and PDF document info).
+
+author = "Riguz Lee"

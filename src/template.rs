@@ -12,27 +12,34 @@ pub fn load_templates(root: &Path) -> Result<Tera> {
     Ok(tera)
 }
 
+/// Render a post page.
+///
+/// `format` selects the view that is embedded:
+/// - `"html"`: native HTML content at `posts/<slug>/index.html` (default)
+/// - `"svg"`: SVG content at `posts/<slug>/svg/index.html`
+/// - `"svg_fallback"`: SVG content at `posts/<slug>/index.html` when the
+///   native HTML compilation failed
 pub fn render_post(
     tera: &Tera,
-    title: &str,
-    date: &str,
-    tags: &[String],
-    lang: &str,
-    summary: &str,
-    author: &str,
-    svg_content: &str,
-    html_content: &str,
+    post: &crate::metadata::PostMeta,
+    svg_content: Option<&str>,
+    html_content: Option<&str>,
+    format: &str,
 ) -> Result<String> {
+    // post pages live one directory above/below the variants
+    let root_path = if format == "svg" { "../../../" } else { "../../" };
+
     let mut ctx = Context::new();
-    ctx.insert("title", title);
-    ctx.insert("date", date);
-    ctx.insert("tags", tags);
-    ctx.insert("lang", lang);
-    ctx.insert("summary", summary);
-    ctx.insert("author", author);
-    ctx.insert("content", svg_content);
-    ctx.insert("html_content", html_content);
-    ctx.insert("root_path", "../../");
+    ctx.insert("title", &post.title);
+    ctx.insert("date", &post.date);
+    ctx.insert("tags", &post.tags);
+    ctx.insert("lang", &post.lang);
+    ctx.insert("summary", &post.summary);
+    ctx.insert("author", &post.author);
+    ctx.insert("svg_content", &svg_content.unwrap_or(""));
+    ctx.insert("html_content", &html_content.unwrap_or(""));
+    ctx.insert("format", format);
+    ctx.insert("root_path", root_path);
     let html = tera.render("post.html", &ctx)?;
     Ok(html)
 }

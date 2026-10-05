@@ -12,6 +12,9 @@ pub fn serve(output_dir: &Path, port: u16) -> Result<()> {
 
     for request in server.incoming_requests() {
         let url_path = request.url().to_string();
+        // Strip the query string (e.g. `?format=svg`); all views are
+        // served as static files from path-based URLs.
+        let url_path = url_path.split('?').next().unwrap_or("");
         let url_path = percent_decode(url_path.trim_start_matches('/'));
 
         let file_path = if url_path.is_empty() {

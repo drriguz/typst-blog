@@ -1,0 +1,12 @@
+<footer class="post-formats">
+    <span class="post-formats-label">Also available as</span>
+    {% if format == "svg" %}
+    <a href="../">HTML</a>
+    <a href="../post.pdf" target="_blank">PDF</a>
+    {% elif format == "html" %}
+    {% if svg_content %}<a href="svg/">SVG</a>{% endif %}
+    <a href="post.pdf" target="_blank">PDF</a>
+    {% else %}
+    <a href="post.pdf" target="_blank">PDF</a>
+    {% endif %}
+</footer>

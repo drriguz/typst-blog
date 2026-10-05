@@ -4,7 +4,6 @@
   title: "__TITLE__",
   date: "__DATE__",
   tags: ("__TAGS__"),
-  author: "Your Name",
   summary: [A brief summary of the post.],
 )
 

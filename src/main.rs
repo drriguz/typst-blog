@@ -1,4 +1,5 @@
 mod build;
+mod config;
 mod metadata;
 mod server;
 mod template;

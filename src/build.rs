@@ -25,6 +25,16 @@ pub fn build_site(root: &Path) -> Result<()> {
     // Sort by date descending
     posts.sort_by(|a, b| b.date.cmp(&a.date));
 
+    // Site-wide settings (author etc.); fill posts that don't set an author
+    let config = crate::config::BlogConfig::load(root)?;
+    if !config.author.is_empty() {
+        for post in posts.iter_mut() {
+            if post.author.is_empty() {
+                post.author = config.author.clone();
+            }
+        }
+    }
+
     // Prepare output directory
     if output_dir.exists() {
         std::fs::remove_dir_all(&output_dir)?;
@@ -46,7 +56,7 @@ pub fn build_site(root: &Path) -> Result<()> {
             println!("[typst] Compiling {} ...", post.title);
 
             // 1. Compile PDF
-            match run_typst(&typ_source, root, "pdf") {
+            match run_typst(&typ_source, root, "pdf", &config.author) {
                 Ok(()) => {
                     let pdf_path = typ_source.with_extension("pdf");
                     if pdf_path.exists() {
@@ -58,38 +68,68 @@ pub fn build_site(root: &Path) -> Result<()> {
                 Err(e) => eprintln!("  -> PDF failed: {}.", e),
             }
 
-            // 2. Compile SVG (one per page) → embed in HTML
-            match run_typst_svg(&typ_source, root, &post_source_dir) {
+            // 2. Compile SVG (one per page) → used for the SVG view
+            let svg_content = match run_typst_svg(&typ_source, root, &post_source_dir, &config.author) {
                 Ok(svg_pages) => {
-                    let svg_content = svg_pages.join("\n");
-
-                    // 3. Compile native HTML (semantic markup for the HTML tab)
-                    let html_content = match run_typst_html(&typ_source, root, &post_source_dir) {
-                        Ok(body) => {
-                            println!("  -> Native HTML generated.");
-                            body
-                        }
-                        Err(e) => {
-                            eprintln!("  -> HTML failed: {}.", e);
-                            String::new()
-                        }
-                    };
-
-                    let full_html = template::render_post(
-                        &tera,
-                        &post.title,
-                        &post.date,
-                        &post.tags,
-                        &post.lang,
-                        &post.summary,
-                        &post.author,
-                        &svg_content,
-                        &html_content,
-                    )?;
-                    std::fs::write(post_output_dir.join("index.html"), &full_html)?;
-                    println!("  -> HTML generated ({} pages).", svg_pages.len());
+                    println!("  -> SVG generated ({} pages).", svg_pages.len());
+                    Some(svg_pages.join("\n"))
                 }
-                Err(e) => eprintln!("  -> SVG failed: {}.", e),
+                Err(e) => {
+                    eprintln!("  -> SVG failed: {}.", e);
+                    None
+                }
+            };
+
+            // 3. Compile native HTML (semantic markup, default view)
+            let html_content = match run_typst_html(&typ_source, root, &post_source_dir, &config.author) {
+                Ok(body) => {
+                    println!("  -> Native HTML generated.");
+                    Some(body)
+                }
+                Err(e) => {
+                    eprintln!("  -> HTML failed: {}.", e);
+                    None
+                }
+            };
+
+            // 4. Write the format views
+            if let Some(svg) = &svg_content {
+                let svg_page = template::render_post(
+                    &tera,
+                    post,
+                    Some(svg.as_str()),
+                    html_content.as_deref(),
+                    "svg",
+                )?;
+                let svg_dir = post_output_dir.join("svg");
+                std::fs::create_dir_all(&svg_dir)?;
+                std::fs::write(svg_dir.join("index.html"), svg_page)?;
+            }
+
+            match (&html_content, &svg_content) {
+                (Some(html), _) => {
+                    let page = template::render_post(
+                        &tera,
+                        post,
+                        svg_content.as_deref(),
+                        Some(html.as_str()),
+                        "html",
+                    )?;
+                    std::fs::write(post_output_dir.join("index.html"), page)?;
+                }
+                (None, Some(svg)) => {
+                    let page = template::render_post(
+                        &tera,
+                        post,
+                        Some(svg.as_str()),
+                        None,
+                        "svg_fallback",
+                    )?;
+                    std::fs::write(post_output_dir.join("index.html"), page)?;
+                }
+                (None, None) => {
+                    eprintln!("  -> No view generated for {}", post.title);
+                }
             }
         }
 
@@ -214,15 +254,10 @@ fn generate_tag_pages(tera: &tera::Tera, posts: &[PostMeta], output_dir: &Path) 
     Ok(())
 }
 
-fn run_typst(typ_path: &Path, project_root: &Path, format: &str) -> Result<()> {
+fn run_typst(typ_path: &Path, project_root: &Path, format: &str, author: &str) -> Result<()> {
     let output_path = typ_path.with_extension(format);
 
-    let typst_cmd = typst_binary(project_root);
-
-    let status = Command::new(typst_cmd)
-        .arg("compile")
-        .arg("--root")
-        .arg(project_root)
+    let status = typst_command(project_root, author)
         .arg("--format")
         .arg(format)
         .arg(typ_path)
@@ -249,18 +284,29 @@ fn typst_binary(project_root: &Path) -> PathBuf {
     }
 }
 
+/// Build a `typst compile` command for the project, passing the
+/// site-wide author (from `blog.toml`) through `--input`.
+fn typst_command(project_root: &Path, author: &str) -> Command {
+    let mut cmd = Command::new(typst_binary(project_root));
+    cmd.arg("compile").arg("--root").arg(project_root);
+    if !author.is_empty() {
+        cmd.arg("--input").arg(format!("author={}", author));
+    }
+    cmd
+}
+
 /// Compile Typst to SVG (one file per page) and return the SVG contents.
-fn run_typst_svg(typ_path: &Path, project_root: &Path, post_dir: &Path) -> Result<Vec<String>> {
+fn run_typst_svg(
+    typ_path: &Path,
+    project_root: &Path,
+    post_dir: &Path,
+    author: &str,
+) -> Result<Vec<String>> {
     // Use {p} for page numbers: post-1.svg, post-2.svg, etc.
     let output_pattern = post_dir.join("post-{p}.svg");
     let output_str = output_pattern.to_str().unwrap();
 
-    let typst_cmd = typst_binary(project_root);
-
-    let status = Command::new(typst_cmd)
-        .arg("compile")
-        .arg("--root")
-        .arg(project_root)
+    let status = typst_command(project_root, author)
         .arg("--format")
         .arg("svg")
         .arg(typ_path)
@@ -297,17 +343,17 @@ fn run_typst_svg(typ_path: &Path, project_root: &Path, post_dir: &Path) -> Resul
 /// Compile Typst to native HTML (`--features html`) and return the
 /// `<body>` content plus any `<style>` blocks Typst injects into `<head>`
 /// (e.g. MathML equation styles).
-fn run_typst_html(typ_path: &Path, project_root: &Path, post_dir: &Path) -> Result<String> {
+fn run_typst_html(
+    typ_path: &Path,
+    project_root: &Path,
+    post_dir: &Path,
+    author: &str,
+) -> Result<String> {
     let output_path = post_dir.join("post-html.tmp");
 
-    let typst_cmd = typst_binary(project_root);
-
-    let status = Command::new(typst_cmd)
-        .arg("compile")
+    let status = typst_command(project_root, author)
         .arg("--features")
         .arg("html")
-        .arg("--root")
-        .arg(project_root)
         .arg("--format")
         .arg("html")
         .arg(typ_path)

@@ -60,12 +60,14 @@ typst watch --root . src/posts/YYYY-MM-DD-slug/post.typ
 1. Scan `src/posts/*/post.typ` for metadata (title, date, tags, summary via regex)
 2. Sort posts by date descending
 3. Per post:
-   - **PDF**: `typst-modified compile --root . --format pdf` → full Tufte layout with marginalia
-   - **SVG**: `typst-modified compile --root . --format svg` → selectable text via `<text>` elements
-   - **Native HTML**: `typst-modified compile --features html --format html` → semantic HTML with MathML; the `<body>` content and `<style>` blocks from `<head>` are extracted and embedded in the HTML tab of `templates/post.html`
+   - **PDF**: `typst-modified compile --root . --format pdf` → copied to `output/posts/<slug>/post.pdf`
+   - **Native HTML** (default view): `typst-modified compile --features html --format html` → the `<body>` content and `<style>` blocks from `<head>` are extracted (string slicing, no rewriting) and rendered into `output/posts/<slug>/index.html`
+   - **SVG**: `typst-modified compile --root . --format svg` → rendered into `output/posts/<slug>/svg/index.html` (one page per screen; for readers who want the exact paged layout)
    - **Images**: copy `images/` to `output/posts/<slug>/images/`
 4. Generate `output/index.html` and `output/tags/<tag>/index.html`
 5. Copy `static/` to `output/`
+
+Post URLs: `/posts/<slug>/` (HTML), `/posts/<slug>/svg/` (SVG), `/posts/<slug>/post.pdf` (PDF). The default page links to the other formats; `?format=svg` / `?format=pdf` are client-side alias redirects to the canonical paths. If native HTML compilation fails for a post, the SVG view falls back to `/posts/<slug>/` so every post stays reachable.
 
 The HTML tab uses Typst's **target-adaptive template**: `src/template.typ` branches on `target() == "html"`. In HTML mode marginalia (place-based, paged-only) is bypassed and the template emits semantic markup — `<span class="sidenote">`, `<aside class="margin-fig">`, `<div class="wide-fig">` — positioned by `static/css/style.css` as Tufte-style margin notes. CSS counters number the notes. The paged output is byte-identical in text content to the non-branched template.
 
@@ -119,6 +121,10 @@ All posts import from this shared template. It provides:
 - **`notefigure(image(...))`** — figure placed entirely in the margin
 
 Each helper branches on `target() == "html"` (via `context` blocks, since `sys.target` no longer exists in 0.15 and `target()` is contextual). In HTML mode they emit `html.elem(...)` equivalents; helpers that keep labels referenceable (e.g. `notefigure`) mirror marginalia's metadata markers so `@fig:` cross-references keep working. `blog-post` itself runs at evaluation time where `target()` is unavailable, so all target-dependent content is deferred into `context` expressions.
+
+### Site Config (`blog.toml`)
+
+Site-wide settings live in `blog.toml` at the project root (currently the `author` name). The CLI reads it and passes the author to Typst via `--input author=…`, where `src/template.typ` picks it up as the default for `blog-post`'s `author` parameter (`sys.inputs.at("author", default: "Author")`). Posts can still override the author by passing it explicitly. The author appears in each post's title block and in document metadata (HTML `<meta name="authors">`, PDF document info).
 
 ### Post Boilerplate
 

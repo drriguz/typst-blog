@@ -81,66 +81,32 @@ a:hover { color: var(--color-link-hover); text-decoration: underline; }
     color: var(--color-link);
 }
 
-/* ─── Post tabs ────────────────────────────────────────────── */
-.post-tabs {
+/* ─── Format links (inside the post detail) ────────────────── */
+.post-formats {
     display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--color-border);
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+    clear: both;
+    margin-top: 3rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--color-border);
+    font-size: 0.9rem;
 }
 
-.tab-btn {
-    padding: 0.4em 1em;
-    border: 1px solid var(--color-border);
-    border-radius: 4px 4px 0 0;
-    background: var(--color-bg);
+.post-formats-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     color: var(--color-text-secondary);
-    font-size: 0.85rem;
-    cursor: pointer;
-    text-decoration: none;
 }
 
-.tab-btn:hover {
-    background: var(--color-tag-bg);
-    color: var(--color-text);
-    text-decoration: none;
+.post-formats a {
+    color: var(--color-link);
 }
 
-.tab-btn.active {
-    background: var(--color-text);
-    color: var(--color-bg);
-    border-color: var(--color-text);
-}
-
-.post-meta-header {
-    display: flex;
-    gap: 1rem;
-    font-size: 0.85rem;
-    color: var(--color-text-secondary);
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--color-border);
-}
-
-.post-author {
-    font-weight: 600;
-}
-
-.tab-content {
-    display: none;
-}
-
-.tab-content.active {
-    display: block;
-}
-
-.placeholder {
-    padding: 2rem;
-    text-align: center;
-    color: var(--color-text-secondary);
-    border: 1px dashed var(--color-border);
-    border-radius: 4px;
+.typst-svg .post-formats {
+    justify-content: center;
 }
 
 /* ─── Footer ───────────────────────────────────────────────── */
