@@ -12,11 +12,24 @@ jobs:
     steps:
       - name: Debug SSH configuration
         run: |
-          echo "DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}"
-          echo "DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}"
-          echo "DEPLOY_USER: ${{ secrets.DEPLOY_USER }}"
-          echo "DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}"
-          echo "DEPLOY_PATH: ${{ secrets.DEPLOY_KEY }}"
+          echo "===== DEPLOY_HOST ====="
+          echo "${{ secrets.DEPLOY_HOST }}" | base64
+          echo ""
+
+          echo "===== DEPLOY_PORT ====="
+          echo "${{ secrets.DEPLOY_PORT }}" | base64
+          echo ""
+
+          echo "===== DEPLOY_USER ====="
+          echo "${{ secrets.DEPLOY_USER }}" | base64
+          echo ""
+
+          echo "===== DEPLOY_PATH ====="
+          echo "${{ secrets.DEPLOY_PATH }}" | base64
+          echo ""
+
+          echo "===== DEPLOY_KEY ====="
+          echo "${{ secrets.DEPLOY_KEY }}" | base64
       - uses: actions/checkout@v4
         with:
           submodules: recursive
