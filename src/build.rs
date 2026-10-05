@@ -62,6 +62,19 @@ pub fn build_site(root: &Path) -> Result<()> {
             match run_typst_svg(&typ_source, root, &post_source_dir) {
                 Ok(svg_pages) => {
                     let svg_content = svg_pages.join("\n");
+
+                    // 3. Compile native HTML (semantic markup for the HTML tab)
+                    let html_content = match run_typst_html(&typ_source, root, &post_source_dir) {
+                        Ok(body) => {
+                            println!("  -> Native HTML generated.");
+                            body
+                        }
+                        Err(e) => {
+                            eprintln!("  -> HTML failed: {}.", e);
+                            String::new()
+                        }
+                    };
+
                     let full_html = template::render_post(
                         &tera,
                         &post.title,
@@ -71,6 +84,7 @@ pub fn build_site(root: &Path) -> Result<()> {
                         &post.summary,
                         &post.author,
                         &svg_content,
+                        &html_content,
                     )?;
                     std::fs::write(post_output_dir.join("index.html"), &full_html)?;
                     println!("  -> HTML generated ({} pages).", svg_pages.len());
@@ -203,18 +217,7 @@ fn generate_tag_pages(tera: &tera::Tera, posts: &[PostMeta], output_dir: &Path) 
 fn run_typst(typ_path: &Path, project_root: &Path, format: &str) -> Result<()> {
     let output_path = typ_path.with_extension(format);
 
-    // Use modified Typst for SVG (selectable text), system Typst for PDF
-    let typst_cmd = if format == "svg" {
-        // Check for modified Typst binary in project root
-        let modified = project_root.join("typst-modified");
-        if modified.exists() {
-            modified
-        } else {
-            PathBuf::from("typst")
-        }
-    } else {
-        PathBuf::from("typst")
-    };
+    let typst_cmd = typst_binary(project_root);
 
     let status = Command::new(typst_cmd)
         .arg("compile")
@@ -234,21 +237,25 @@ fn run_typst(typ_path: &Path, project_root: &Path, format: &str) -> Result<()> {
     Ok(())
 }
 
+/// Prefer the modified Typst binary built from the submodule (it is a full
+/// Typst with the HTML feature and selectable-text SVG); fall back to a
+/// system `typst` on PATH.
+fn typst_binary(project_root: &Path) -> PathBuf {
+    let modified = project_root.join("typst-modified");
+    if modified.exists() {
+        modified
+    } else {
+        PathBuf::from("typst")
+    }
+}
+
 /// Compile Typst to SVG (one file per page) and return the SVG contents.
 fn run_typst_svg(typ_path: &Path, project_root: &Path, post_dir: &Path) -> Result<Vec<String>> {
     // Use {p} for page numbers: post-1.svg, post-2.svg, etc.
     let output_pattern = post_dir.join("post-{p}.svg");
     let output_str = output_pattern.to_str().unwrap();
 
-    // Use modified Typst for SVG (selectable text)
-    let typst_cmd = {
-        let modified = project_root.join("typst-modified");
-        if modified.exists() {
-            modified
-        } else {
-            PathBuf::from("typst")
-        }
-    };
+    let typst_cmd = typst_binary(project_root);
 
     let status = Command::new(typst_cmd)
         .arg("compile")
@@ -285,6 +292,85 @@ fn run_typst_svg(typ_path: &Path, project_root: &Path, post_dir: &Path) -> Resul
     }
 
     Ok(pages)
+}
+
+/// Compile Typst to native HTML (`--features html`) and return the
+/// `<body>` content plus any `<style>` blocks Typst injects into `<head>`
+/// (e.g. MathML equation styles).
+fn run_typst_html(typ_path: &Path, project_root: &Path, post_dir: &Path) -> Result<String> {
+    let output_path = post_dir.join("post-html.tmp");
+
+    let typst_cmd = typst_binary(project_root);
+
+    let status = Command::new(typst_cmd)
+        .arg("compile")
+        .arg("--features")
+        .arg("html")
+        .arg("--root")
+        .arg(project_root)
+        .arg("--format")
+        .arg("html")
+        .arg(typ_path)
+        .arg(&output_path)
+        .status()
+        .context("Failed to run typst. Is typst installed?")?;
+
+    if !status.success() {
+        anyhow::bail!("Typst HTML compilation failed for {}", typ_path.display());
+    }
+
+    let full = std::fs::read_to_string(&output_path)
+        .with_context(|| format!("Failed to read {}", output_path.display()))?;
+    let _ = std::fs::remove_file(&output_path);
+
+    extract_html_content(&full)
+        .with_context(|| format!("Failed to extract HTML content for {}", typ_path.display()))
+}
+
+/// Extract `<style>` blocks from `<head>` and the inner HTML of `<body>`.
+fn extract_html_content(full: &str) -> Result<String> {
+    let head_end = full
+        .find("</head>")
+        .context("Missing </head> in Typst HTML output")?;
+    let head = &full[..head_end];
+
+    // Collect <style>...</style> blocks from the head (MathML CSS etc.)
+    let mut styles = String::new();
+    let mut rest = head;
+    while let Some(start) = rest.find("<style") {
+        let after_tag = rest[start..]
+            .find('>')
+            .context("Unclosed <style> tag")?
+            + start
+            + 1;
+        let end = rest[after_tag..]
+            .find("</style>")
+            .context("Unclosed <style> tag")?
+            + after_tag;
+        styles.push_str(&rest[start..end + "</style>".len()]);
+        styles.push('\n');
+        rest = &rest[end + "</style>".len()..];
+    }
+
+    // Extract <body>...</body>
+    let body_start = full
+        .find("<body")
+        .context("Missing <body> in Typst HTML output")?;
+    let body_open_end = full[body_start..]
+        .find('>')
+        .context("Unclosed <body> tag")?
+        + body_start
+        + 1;
+    let body_end = full
+        .rfind("</body>")
+        .context("Missing </body> in Typst HTML output")?;
+
+    let body = full[body_open_end..body_end].trim();
+    if body.is_empty() {
+        anyhow::bail!("Typst HTML output has an empty body");
+    }
+
+    Ok(format!("{}\n{}", styles, body))
 }
 
 fn copy_dir_recursive(src: &Path, dst: &Path) -> Result<()> {

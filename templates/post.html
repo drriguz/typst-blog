@@ -9,22 +9,33 @@
 </div>
 
 <div class="post-tabs">
+    {% if html_content %}
+    <button class="tab-btn active" data-tab="html">HTML</button>
+    <button class="tab-btn" data-tab="svg">SVG</button>
+    {% else %}
     <button class="tab-btn active" data-tab="svg">SVG</button>
     <button class="tab-btn" data-tab="html">HTML</button>
+    {% endif %}
     <a href="post.pdf" class="tab-btn" target="_blank">PDF</a>
 </div>
 
-<div id="tab-svg" class="tab-content active">
+<div id="tab-svg" class="tab-content {% if not html_content %}active{% endif %}">
     <div class="typst-svg">
         {{ content | safe }}
     </div>
 </div>
 
-<div id="tab-html" class="tab-content">
+<div id="tab-html" class="tab-content {% if html_content %}active{% endif %}">
+    {% if html_content %}
+    <div class="typst-html">
+        {{ html_content | safe }}
+    </div>
+    {% else %}
     <div class="placeholder">
         <p>HTML view coming soon.</p>
         <p><a href="post.pdf">Download PDF</a> for the full formatted version.</p>
     </div>
+    {% endif %}
 </div>
 
 <script>

@@ -60,15 +60,18 @@ typst watch --root . src/posts/YYYY-MM-DD-slug/post.typ
 1. Scan `src/posts/*/post.typ` for metadata (title, date, tags, summary via regex)
 2. Sort posts by date descending
 3. Per post:
-   - **PDF**: `typst compile --root . --format pdf` → full Tufte layout with marginalia
+   - **PDF**: `typst-modified compile --root . --format pdf` → full Tufte layout with marginalia
    - **SVG**: `typst-modified compile --root . --format svg` → selectable text via `<text>` elements
+   - **Native HTML**: `typst-modified compile --features html --format html` → semantic HTML with MathML; the `<body>` content and `<style>` blocks from `<head>` are extracted and embedded in the HTML tab of `templates/post.html`
    - **Images**: copy `images/` to `output/posts/<slug>/images/`
 4. Generate `output/index.html` and `output/tags/<tag>/index.html`
 5. Copy `static/` to `output/`
 
+The HTML tab uses Typst's **target-adaptive template**: `src/template.typ` branches on `target() == "html"`. In HTML mode marginalia (place-based, paged-only) is bypassed and the template emits semantic markup — `<span class="sidenote">`, `<aside class="margin-fig">`, `<div class="wide-fig">` — positioned by `static/css/style.css` as Tufte-style margin notes. CSS counters number the notes. The paged output is byte-identical in text content to the non-branched template.
+
 ### Modified Typst Binary
 
-The `typst-modified` binary is built from the `typst-src/` submodule. It renders text as SVG `<text>` elements instead of `<use>` elements, making text selectable and searchable in browsers.
+The `typst-modified` binary is built from the `typst-src/` submodule (a fork of Typst 0.15-dev). It renders text as SVG `<text>` elements instead of `<use>` elements, making text selectable and searchable in browsers.
 
 Key changes in Typst source (`crates/typst-svg/src/text.rs`):
 - `render_text()` checks if all glyphs are outline glyphs
@@ -76,6 +79,10 @@ Key changes in Typst source (`crates/typst-svg/src/text.rs`):
 - Falls back to `<use>` elements for color/image glyphs
 
 **Math font constraint:** Fonts with a MATH table (e.g., "New Computer Modern Math") must always be rendered as shapes (`<use>` with `<path>` elements), never as `<text>` elements. Browsers typically don't have math fonts installed, so `<text>` with a math `font-family` won't render correctly. The `render_text()` method checks `FontFlags::MATH` and forces the glyph path for math fonts.
+
+The fork already includes Typst's experimental **HTML export** (semantic HTML + MathML, behind `--features html`), so no additional fork changes are needed for the HTML tab. The binary is used for all three formats (PDF, SVG, native HTML); a system `typst` on PATH is only a fallback when `typst-modified` is absent.
+
+Limitations of the native HTML export: Typst-drawn figures (`grid`/`rect` diagrams) are ignored with a warning and render empty in the HTML tab (they remain fine in SVG/PDF); local images are inlined as base64 data URIs.
 
 Build: `make typst-modified` (compiles from `typst-src/` submodule)
 
@@ -97,6 +104,8 @@ CSS fallbacks for HTML (fonts not served as web fonts):
 - Sans: `Arial, Helvetica, sans-serif`
 - Mono: `Consolas, monospace`
 
+Exception: **New Computer Modern Math** (`static/fonts/NewCMMath-Regular.woff2`, converted from the typst-assets checkout that ships with the submodule) is served as a webfont so MathML in the HTML tab renders consistently across browsers. It is the same math font Typst embeds for PDF/SVG. The `@font-face` lives at the top of `static/css/style.css`.
+
 ### Typst Template (`src/template.typ`)
 
 All posts import from this shared template. It provides:
@@ -108,6 +117,8 @@ All posts import from this shared template. It provides:
 - **`newthought[...]`** — small caps paragraph opener
 - **`widefig[...]`** — content extending into the margin
 - **`notefigure(image(...))`** — figure placed entirely in the margin
+
+Each helper branches on `target() == "html"` (via `context` blocks, since `sys.target` no longer exists in 0.15 and `target()` is contextual). In HTML mode they emit `html.elem(...)` equivalents; helpers that keep labels referenceable (e.g. `notefigure`) mirror marginalia's metadata markers so `@fig:` cross-references keep working. `blog-post` itself runs at evaluation time where `target()` is unavailable, so all target-dependent content is deferred into `context` expressions.
 
 ### Post Boilerplate
 

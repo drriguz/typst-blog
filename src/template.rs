@@ -20,7 +20,8 @@ pub fn render_post(
     lang: &str,
     summary: &str,
     author: &str,
-    content: &str,
+    svg_content: &str,
+    html_content: &str,
 ) -> Result<String> {
     let mut ctx = Context::new();
     ctx.insert("title", title);
@@ -29,7 +30,8 @@ pub fn render_post(
     ctx.insert("lang", lang);
     ctx.insert("summary", summary);
     ctx.insert("author", author);
-    ctx.insert("content", content);
+    ctx.insert("content", svg_content);
+    ctx.insert("html_content", html_content);
     ctx.insert("root_path", "../../");
     let html = tera.render("post.html", &ctx)?;
     Ok(html)

@@ -318,3 +318,321 @@ main:has(.typst-svg) {
     user-select: text;
     -webkit-user-select: text;
 }
+
+/* ─── Typst native HTML (post content) ─────────────────────── */
+main:has(.typst-html) {
+    max-width: none;
+}
+
+.typst-html {
+    --margin-w: 13rem;
+    --margin-gap: 2rem;
+    --sidenote-size: 0.82em;
+    max-width: calc(var(--content-width) + var(--margin-w) + var(--margin-gap));
+    margin: 0 auto;
+    padding-right: calc(var(--margin-w) + var(--margin-gap));
+    font-size: 1rem;
+    line-height: 1.6;
+    counter-reset: sidenote;
+    overflow-wrap: break-word;
+}
+
+/* Title block */
+.typst-html .post-title-block h1 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin: 0 0 0.3rem;
+    line-height: 1.25;
+}
+
+.typst-html .post-subline {
+    font-size: 0.85rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 0.9rem;
+}
+
+.typst-html .post-summary-block {
+    font-size: 0.92rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 1.2rem;
+    text-align: justify;
+}
+
+/* Paragraphs */
+.typst-html p {
+    text-align: justify;
+    hyphens: auto;
+    margin-bottom: 0.6em;
+}
+
+/* Headings (Typst level N → h(N+1)) */
+.typst-html h2 {
+    font-size: 1.35rem;
+    margin: 1.6em 0 0.6em;
+}
+
+.typst-html h3 {
+    font-size: 1.15rem;
+    margin: 1.4em 0 0.5em;
+}
+
+.typst-html h4, .typst-html h5, .typst-html h6 {
+    font-size: 1rem;
+    margin: 1.2em 0 0.4em;
+}
+
+/* Lists */
+.typst-html ul, .typst-html ol {
+    margin: 0.6em 0 0.6em;
+    padding-left: 1.6em;
+}
+
+.typst-html li {
+    margin-bottom: 0.3em;
+}
+
+/* Tables */
+.typst-html table {
+    border-collapse: collapse;
+    margin: 1em auto;
+    font-size: 0.9em;
+}
+
+.typst-html th, .typst-html td {
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+    padding: 0.35em 0.8em;
+}
+
+.typst-html thead th {
+    border-bottom: 2px solid var(--color-border);
+}
+
+/* Code */
+.typst-html pre {
+    font-family: "Cascadia Code", Consolas, monospace;
+    font-size: 0.85em;
+    background: #f5f5f4;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 0.75em 1em;
+    margin: 0.8em 0;
+    overflow-x: auto;
+    line-height: 1.45;
+}
+
+.typst-html code {
+    font-family: "Cascadia Code", Consolas, monospace;
+    font-size: 0.88em;
+    background: #f0f0ee;
+    padding: 0.1em 0.35em;
+    border-radius: 3px;
+}
+
+.typst-html pre code {
+    background: none;
+    padding: 0;
+    font-size: 1em;
+}
+
+/* Images and figures */
+.typst-html img {
+    max-width: 100%;
+    height: auto;
+}
+
+.typst-html figure {
+    margin: 1em 0;
+    text-align: center;
+}
+
+.typst-html figure img {
+    display: block;
+    margin: 0 auto;
+}
+
+.typst-html figcaption {
+    font-size: 0.85em;
+    color: var(--color-text-secondary);
+    margin-bottom: 0.5em;
+    text-align: center;
+}
+
+/* Wide figures extend into the margin */
+.typst-html .wide-fig {
+    margin-right: calc(-1 * (var(--margin-w) + var(--margin-gap)));
+}
+
+/* ─── Margin notes (Tufte-style floats) ────────────────────── */
+.typst-html .sidenote {
+    float: right;
+    clear: right;
+    width: var(--margin-w);
+    margin-right: calc(-1 * (var(--margin-w) + var(--margin-gap)));
+    margin-top: 0.3rem;
+    margin-bottom: 1rem;
+    font-size: var(--sidenote-size);
+    line-height: 1.45;
+    text-align: left;
+    vertical-align: baseline;
+}
+
+.typst-html .margin-fig {
+    float: right;
+    clear: right;
+    width: var(--margin-w);
+    margin-right: calc(-1 * (var(--margin-w) + var(--margin-gap)));
+    margin-top: 0.3rem;
+    margin-bottom: 1rem;
+    font-size: var(--sidenote-size);
+    line-height: 1.45;
+}
+
+.typst-html .margin-fig figure {
+    margin: 0;
+    text-align: left;
+}
+
+/* Numbered notes: numbers via CSS counters (Typst emits empty <sup>) */
+.typst-html sup.note-ref {
+    counter-increment: sidenote;
+    font-size: 0.75em;
+    line-height: 0;
+    vertical-align: super;
+}
+
+.typst-html sup.note-ref::before {
+    content: counter(sidenote);
+    color: var(--color-link);
+    font-weight: 600;
+}
+
+.typst-html .sidenote.numbered::before {
+    content: counter(sidenote) " ";
+    color: var(--color-link);
+    font-weight: 600;
+}
+
+/* Math webfont: New Computer Modern Math is the font Typst embeds for
+   PDF/SVG math (GUST Font License). Serving it makes MathML in the HTML
+   tab render consistently across browsers. */
+@font-face {
+    font-family: "New Computer Modern Math";
+    src: url("../fonts/NewCMMath-Regular.woff2") format("woff2");
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Equations (MathML) */
+.typst-html math {
+    font-family: "New Computer Modern Math", "Latin Modern Math", "STIX Two Math", "Cambria Math", serif;
+}
+
+/* Do NOT override `display`: the UA stylesheet uses `block math`, which
+   is required for proper math layout. Only add spacing/overflow. */
+.typst-html math[display="block"] {
+    margin: 0.4em 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.typst-html .eq-display {
+    position: relative;
+    margin: 0.6em 0;
+}
+
+.typst-html .eq-display .eq-num {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-secondary);
+    font-size: 0.9em;
+    font-family: "Linux Libertine O", Georgia, serif;
+}
+
+/* Epigraph */
+.typst-html blockquote.epigraph {
+    margin: 1.2em 10% 1.4em;
+    font-size: 0.92em;
+}
+
+.typst-html .epigraph-quote {
+    font-style: italic;
+}
+
+.typst-html .epigraph-author {
+    text-align: right;
+    color: var(--color-text-secondary);
+    font-size: 0.9em;
+}
+
+/* New thought opener */
+.typst-html .newthought {
+    font-variant: small-caps;
+}
+
+/* Table of contents */
+.typst-html nav[role="doc-toc"] {
+    font-size: 0.85rem;
+    margin: 1.2em 0;
+    padding: 0.6em 0;
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.typst-html nav[role="doc-toc"] h2 {
+    font-size: 0.95rem;
+    margin: 0 0 0.3em;
+}
+
+.typst-html nav[role="doc-toc"] ol {
+    padding-left: 1.2em;
+    margin: 0.4em 0;
+}
+
+/* Footnotes */
+.typst-html .footnotes {
+    font-size: 0.85em;
+    border-top: 1px solid var(--color-border);
+    padding-top: 0.6em;
+    margin-top: 2em;
+}
+
+/* Bibliography */
+.typst-html .bibliography {
+    font-size: 0.85em;
+}
+
+/* ─── Margin notes: narrow screens ─────────────────────────── */
+@media (max-width: 62rem) {
+    .typst-html {
+        max-width: var(--content-width);
+        padding-right: 0;
+    }
+
+    .typst-html .sidenote,
+    .typst-html .margin-fig {
+        float: none;
+        clear: none;
+        display: block;
+        width: auto;
+        margin: 0.8rem 0 0.8rem 0.4rem;
+        padding-left: 0.75rem;
+        border-left: 2px solid var(--color-border);
+    }
+
+    .typst-html .wide-fig {
+        margin-right: 0;
+    }
+
+    .typst-html sup.note-ref::after {
+        content: none;
+    }
+
+    .typst-html sup.note-ref::before {
+        content: "▸";
+        font-weight: 400;
+    }
+}
